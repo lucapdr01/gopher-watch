@@ -1,70 +1,33 @@
-package main
+#include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include "metrics.pb.h"
 
-import (
-	"fmt"
-	"log"
-	"net"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
+int main(){
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in  address;
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(8080);
 
-	pb "gopher-sre/proto"
-	"google.golang.org/protobuf/proto"
-)
+    bind(server_fd, (struct sockaddr*)&address, sizeof(address));
+    listen(server_fd, 3);
 
-func main() {
-	// 1. Setup Signal Handling (The SRE way to handle restarts)
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+    std::cout << "📥 C++ Sink listening on 8080..." << std::endl;
 
-	fmt.Println("🚀 GopherWatch starting...")
+    while(true){
+        int new_socket = accept(server_fd, nullptr, nullptr);
+        char buffer[1024] = {0};
+        
+        int valread = read(new_socket, buffer, 1024);
 
-	// 2. Start the background collection loop
-	go func() {
-		for {
-			// We try to connect inside the loop (Self-healing logic)
-			conn, err := net.DialTimeout("tcp", "localhost:8080", 2*time.Second)
-			if err != nil {
-				log.Println("⚠️ Backend unreachable, retrying in 5s...")
-				time.Sleep(5 * time.Second)
-				continue
-			}
-
-			fmt.Println("✅ Connected to C++ Backend.")
-			sendMetrics(conn)
-			conn.Close()
-		}
-	}()
-
-	// Wait here until Ctrl+C
-	<-stop
-	fmt.Println("\n🛑 Shutdown signal received. Exiting.")
-}
-
-func sendMetrics(conn net.Conn) {
-	for {
-		report := &pb.MetricReport{
-			HostName:   "dublin-srv-01",
-			CpuUsage:   42.0, // In a real app, you'd pull this from the OS
-			MemoryFree: 1024,
-			Timestamp:  time.Now().Unix(),
-		}
-
-		data, err := proto.Marshal(report)
-		if err != nil {
-			log.Println("Marshaling error:", err)
-			return
-		}
-
-		// Write data to the TCP socket
-		_, err = conn.Write(data)
-		if err != nil {
-			log.Println("Connection lost:", err)
-			return // Exit and let the main loop reconnect
-		}
-
-		fmt.Printf(" [SENT] %d bytes\n", len(data))
-		time.Sleep(2 * time.Second)
-	}
+        metrics::MetricReport report;
+        if (report.ParseFromArray(buffer, valread)) {
+            std::cout << "📊 Received: " << report.host_name() 
+                      << " | CPU: " << report.cpu_usage() << "%" << std::endl;
+        }
+        close(new_socket);
+    }
+    return 0;   
 }
