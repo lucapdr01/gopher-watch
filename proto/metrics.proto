@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option  go_package = "gopher-sre/proto";
+
+package metrics;
+
+message MetricReport {
+    string host_name = 1;
+    double cpu_usage = 2;
+    uint64 memory_free = 3;
+    int64 timestamp = 4;
+}
+
