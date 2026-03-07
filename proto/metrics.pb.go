@@ -22,13 +22,17 @@ const (
 )
 
 type MetricReport struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	HostName      string                 `protobuf:"bytes,1,opt,name=host_name,json=hostName,proto3" json:"host_name,omitempty"`
-	CpuUsage      float64                `protobuf:"fixed64,2,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	MemoryFree    uint64                 `protobuf:"varint,3,opt,name=memory_free,json=memoryFree,proto3" json:"memory_free,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	HostId           string                 `protobuf:"bytes,1,opt,name=host_id,json=hostId,proto3" json:"host_id,omitempty"`
+	HostName         string                 `protobuf:"bytes,2,opt,name=host_name,json=hostName,proto3" json:"host_name,omitempty"`
+	CpuUsagePercent  float64                `protobuf:"fixed64,3,opt,name=cpu_usage_percent,json=cpuUsagePercent,proto3" json:"cpu_usage_percent,omitempty"`
+	MemoryUsedBytes  uint64                 `protobuf:"varint,4,opt,name=memory_used_bytes,json=memoryUsedBytes,proto3" json:"memory_used_bytes,omitempty"`
+	MemoryTotalBytes uint64                 `protobuf:"varint,5,opt,name=memory_total_bytes,json=memoryTotalBytes,proto3" json:"memory_total_bytes,omitempty"`
+	DiskUtilization  float64                `protobuf:"fixed64,6,opt,name=disk_utilization,json=diskUtilization,proto3" json:"disk_utilization,omitempty"`
+	TimestampUnix    int64                  `protobuf:"varint,7,opt,name=timestamp_unix,json=timestampUnix,proto3" json:"timestamp_unix,omitempty"`
+	Labels           map[string]string      `protobuf:"bytes,8,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *MetricReport) Reset() {
@@ -61,6 +65,13 @@ func (*MetricReport) Descriptor() ([]byte, []int) {
 	return file_proto_metrics_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *MetricReport) GetHostId() string {
+	if x != nil {
+		return x.HostId
+	}
+	return ""
+}
+
 func (x *MetricReport) GetHostName() string {
 	if x != nil {
 		return x.HostName
@@ -68,38 +79,129 @@ func (x *MetricReport) GetHostName() string {
 	return ""
 }
 
-func (x *MetricReport) GetCpuUsage() float64 {
+func (x *MetricReport) GetCpuUsagePercent() float64 {
 	if x != nil {
-		return x.CpuUsage
+		return x.CpuUsagePercent
 	}
 	return 0
 }
 
-func (x *MetricReport) GetMemoryFree() uint64 {
+func (x *MetricReport) GetMemoryUsedBytes() uint64 {
 	if x != nil {
-		return x.MemoryFree
+		return x.MemoryUsedBytes
 	}
 	return 0
 }
 
-func (x *MetricReport) GetTimestamp() int64 {
+func (x *MetricReport) GetMemoryTotalBytes() uint64 {
 	if x != nil {
-		return x.Timestamp
+		return x.MemoryTotalBytes
 	}
 	return 0
+}
+
+func (x *MetricReport) GetDiskUtilization() float64 {
+	if x != nil {
+		return x.DiskUtilization
+	}
+	return 0
+}
+
+func (x *MetricReport) GetTimestampUnix() int64 {
+	if x != nil {
+		return x.TimestampUnix
+	}
+	return 0
+}
+
+func (x *MetricReport) GetLabels() map[string]string {
+	if x != nil {
+		return x.Labels
+	}
+	return nil
+}
+
+type Heartbeat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	HostId        string                 `protobuf:"bytes,1,opt,name=host_id,json=hostId,proto3" json:"host_id,omitempty"`
+	TimestampUnix int64                  `protobuf:"varint,2,opt,name=timestamp_unix,json=timestampUnix,proto3" json:"timestamp_unix,omitempty"`
+	Version       string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Heartbeat) Reset() {
+	*x = Heartbeat{}
+	mi := &file_proto_metrics_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Heartbeat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Heartbeat) ProtoMessage() {}
+
+func (x *Heartbeat) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_metrics_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
+func (*Heartbeat) Descriptor() ([]byte, []int) {
+	return file_proto_metrics_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Heartbeat) GetHostId() string {
+	if x != nil {
+		return x.HostId
+	}
+	return ""
+}
+
+func (x *Heartbeat) GetTimestampUnix() int64 {
+	if x != nil {
+		return x.TimestampUnix
+	}
+	return 0
+}
+
+func (x *Heartbeat) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
 }
 
 var File_proto_metrics_proto protoreflect.FileDescriptor
 
 const file_proto_metrics_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/metrics.proto\x12\ametrics\"\x87\x01\n" +
-	"\fMetricReport\x12\x1b\n" +
-	"\thost_name\x18\x01 \x01(\tR\bhostName\x12\x1b\n" +
-	"\tcpu_usage\x18\x02 \x01(\x01R\bcpuUsage\x12\x1f\n" +
-	"\vmemory_free\x18\x03 \x01(\x04R\n" +
-	"memoryFree\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\x03R\ttimestampB\x12Z\x10gopher-sre/protob\x06proto3"
+	"\x13proto/metrics.proto\x12\ametrics\"\x92\x03\n" +
+	"\fMetricReport\x12\x17\n" +
+	"\ahost_id\x18\x01 \x01(\tR\x06hostId\x12\x1b\n" +
+	"\thost_name\x18\x02 \x01(\tR\bhostName\x12*\n" +
+	"\x11cpu_usage_percent\x18\x03 \x01(\x01R\x0fcpuUsagePercent\x12*\n" +
+	"\x11memory_used_bytes\x18\x04 \x01(\x04R\x0fmemoryUsedBytes\x12,\n" +
+	"\x12memory_total_bytes\x18\x05 \x01(\x04R\x10memoryTotalBytes\x12)\n" +
+	"\x10disk_utilization\x18\x06 \x01(\x01R\x0fdiskUtilization\x12%\n" +
+	"\x0etimestamp_unix\x18\a \x01(\x03R\rtimestampUnix\x129\n" +
+	"\x06labels\x18\b \x03(\v2!.metrics.MetricReport.LabelsEntryR\x06labels\x1a9\n" +
+	"\vLabelsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"e\n" +
+	"\tHeartbeat\x12\x17\n" +
+	"\ahost_id\x18\x01 \x01(\tR\x06hostId\x12%\n" +
+	"\x0etimestamp_unix\x18\x02 \x01(\x03R\rtimestampUnix\x12\x18\n" +
+	"\aversion\x18\x03 \x01(\tR\aversionB\x12Z\x10gopher-sre/protob\x06proto3"
 
 var (
 	file_proto_metrics_proto_rawDescOnce sync.Once
@@ -113,16 +215,19 @@ func file_proto_metrics_proto_rawDescGZIP() []byte {
 	return file_proto_metrics_proto_rawDescData
 }
 
-var file_proto_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_proto_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_metrics_proto_goTypes = []any{
 	(*MetricReport)(nil), // 0: metrics.MetricReport
+	(*Heartbeat)(nil),    // 1: metrics.Heartbeat
+	nil,                  // 2: metrics.MetricReport.LabelsEntry
 }
 var file_proto_metrics_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: metrics.MetricReport.labels:type_name -> metrics.MetricReport.LabelsEntry
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_metrics_proto_init() }
@@ -136,7 +241,7 @@ func file_proto_metrics_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_metrics_proto_rawDesc), len(file_proto_metrics_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
